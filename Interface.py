@@ -1,8 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
-
-from Git.Team_25 import Database
+from Database import Database
 
 
 

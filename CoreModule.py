@@ -1,6 +1,5 @@
 from tkinter import *
-
-from Git.Team_25 import Interface
+from Interface import Interface
 
 
 # The main class
