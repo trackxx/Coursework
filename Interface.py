@@ -4,7 +4,6 @@ from tkinter import messagebox
 from Database import Database
 
 
-
 # The main Interface class. The window frame is instantiated here and the log-in menu given on startup.
 # Creating more methods and linking them in-between expands the program.
 class Interface():
@@ -18,7 +17,7 @@ class Interface():
         self.database = Database("credentials.db")
 
     def clearWindow(self):
-        self.container.destroy()
+        self.container.grid_forget()
         self.container = Frame(self.window)
         self.container.grid()
 
@@ -84,6 +83,7 @@ class Interface():
         def tryLogIn():
             if self.logIn():
                 self.clearWindow()
+                self.createMenu(self.entUsername.get())
 
         def tryRegister():
             if self.register():
@@ -152,3 +152,11 @@ class Interface():
         self.database.addEntry(username, password, course)
         messagebox.showinfo("Registered", "You have successfully registered! You can now log-in.")
         return True
+
+    def createMenu(self, username):
+        for row in self.database.getUserData(username):
+            print(row)
+
+            lblCourse = Label(self.container, text=row[1], font=('MS', 10))
+
+            lblCourse.grid(row=0, column=0, columnspan=2)
