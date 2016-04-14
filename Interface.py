@@ -4,6 +4,7 @@ from tkinter import messagebox
 from Database import Database
 import re
 
+
 # The main Interface class. The window frame is instantiated here and the log-in menu given on startup.
 # Creating more methods and linking them in-between expands the program.
 class Interface():
@@ -20,6 +21,8 @@ class Interface():
         self.container.grid_forget()
         self.container = Frame(self.window)
         self.container.grid()
+        self.errMessage = Message(self.container, font=('MS', 10), fg='red', width="320")
+        self.errMessage.config(justify="center")
 
     def startup(self):
 
@@ -30,7 +33,7 @@ class Interface():
         lblCourse = Label(self.container, text='Your Course:', font=('MS', 10))
         lblOr = Label(self.container, text='or', font=('MS', 10))
         lblID = Label(self.container, text='Student ID:', font=('MS', 10))
-        btnLogIn = Button(self.container, text='log-in', font=('MS', 10))
+        btnLogIn = Button(self.container, text='Log-In', font=('MS', 10))
         btnRegister = Button(self.container, text='Register', font=('MS', 10))
         btnOpenLogIn = Button(self.container, text='Open log-in Form', font=('MS', 10))
         btnOpenReg = Button(self.container, text='Open Registration Form', font=('MS', 10))
@@ -168,8 +171,40 @@ class Interface():
 
     def createMenu(self, username):
         for row in self.database.getUserData(username):
-            lblCourse = Label(self.container, text=row[1], font=('MS', 10))
-            lblID = Label(self.container, text=row[2], font=('MS', 10))
+            frmCourse = Frame(self.container)
+            lblID = Label(self.container, text="Student ID: " + row[2], font=('MS', 10))
+            lblCourse = Label(self.container, text="Course: " + row[1], font=('MS', 10))
+            lblLesson = Label(frmCourse, text="Choose lesson: ", font=('MS', 10))
+            lblOr = Label(frmCourse, text='or', font=('MS', 10))
+            cmbCourse = ttk.Combobox(frmCourse, width=17, state="readonly")
+            btnSelect = Button(frmCourse, text='Go to Lesson', font=('MS', 10))
+            btnHistory = Button(frmCourse, text='View History', font=('MS', 10))
 
-            lblCourse.grid(row=0, column=0, columnspan=2)
-            lblID.grid(row=1, column=0, columnspan=2)
+            cmbCourse['values'] = ["Lesson 1", "Lesson 2"]
+
+            # DELETE ME
+            def select():
+                if len(cmbCourse.get()) == 0:
+                    print("You must choose a lesson!")
+                    self.errMessage.grid(row=3, columnspan=2)
+                    self.errMessage.config(text="You must choose a lesson!")
+                    return
+                self.clearWindow()
+                print("Open Lesson Menu")
+
+            def history():
+                self.clearWindow()
+                print("Open History Menu")
+
+            btnSelect['command'] = select
+            btnHistory['command'] = history
+
+            lblID.grid(row=0, column=0, columnspan=2, sticky=W, padx=5, pady=5)
+            lblCourse.grid(row=1, column=0, columnspan=2, sticky=W, padx=5)
+            frmCourse.grid(row=2, columnspan=2, pady=20, padx=5)
+            lblLesson.grid(row=0, column=0, sticky=W, pady=5)
+            cmbCourse.grid(row=0, column=1, sticky=W, pady=5)
+            btnSelect.grid(row=1, columnspan=2, pady=5)
+            lblOr.grid(row=3, column=0, columnspan=2, pady=10)
+            btnHistory.grid(row=4, columnspan=2, pady=5)
+
