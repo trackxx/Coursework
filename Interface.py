@@ -150,7 +150,7 @@ class Interface():
 
         if len(password) < 8:
             self.errMessage.grid(row=8, columnspan=2)
-            self.errMessage.config(text="Password must be 8 character or more!")
+            self.errMessage.config(text="Password must be at least 8 characters long!")
             return False
 
         if password != passwordRep:
@@ -166,7 +166,7 @@ class Interface():
         # User is registered into the database here
         self.errMessage.grid_forget()
         self.database.addEntry(username, password, course, id)
-        messagebox.showinfo("Registered", "You have successfully registered! You can now log-in.")
+        messagebox.showinfo("Registered", "You have successfully registered! You can now log in.")
         return True
 
     def createMenu(self, username):
