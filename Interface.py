@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 from Database import Database
-
+import re
 
 # The main Interface class. The window frame is instantiated here and the log-in menu given on startup.
 # Creating more methods and linking them in-between expands the program.
@@ -29,6 +29,7 @@ class Interface():
         lblRepeat = Label(self.container, text='Repeat Password:', font=('MS', 10))
         lblCourse = Label(self.container, text='Your Course:', font=('MS', 10))
         lblOr = Label(self.container, text='or', font=('MS', 10))
+        lblID = Label(self.container, text='Student ID:', font=('MS', 10))
         btnLogIn = Button(self.container, text='log-in', font=('MS', 10))
         btnRegister = Button(self.container, text='Register', font=('MS', 10))
         btnOpenLogIn = Button(self.container, text='Open log-in Form', font=('MS', 10))
@@ -37,6 +38,7 @@ class Interface():
         self.entUsername = Entry(self.container)
         self.entPassword = Entry(self.container, show="*")
         self.entRepeat = Entry(self.container, show="*")
+        self.entID = Entry(self.container)
         self.cmbCourse = ttk.Combobox(self.container, width=17, state="readonly")
 
         # Widget configuration
@@ -56,11 +58,13 @@ class Interface():
             btnOpenReg.grid_forget()
             lblRepeat.grid(row=2, column=0, padx=10, pady=5, sticky=E)
             self.entRepeat.grid(row=2, column=1)
-            lblCourse.grid(row=3, column=0, padx=10, pady=5, sticky=E)
-            self.cmbCourse.grid(row=3, column=1, padx=10)
-            btnRegister.grid(row=4, column=0, columnspan=2, pady=10)
-            lblOr.grid(row=5, column=0, columnspan=2, pady=5)
-            btnOpenLogIn.grid(row=6, column=0, columnspan=2, pady=10)
+            lblID.grid(row=3, column=0, padx=10, pady=5, sticky=E)
+            self.entID.grid(row=3, column=1)
+            lblCourse.grid(row=4, column=0, padx=10, pady=5, sticky=E)
+            self.cmbCourse.grid(row=4, column=1, padx=10)
+            btnRegister.grid(row=5, column=0, columnspan=2, pady=10)
+            lblOr.grid(row=6, column=0, columnspan=2, pady=5)
+            btnOpenLogIn.grid(row=7, column=0, columnspan=2, pady=10)
             self.entUsername.delete(0, END)
             self.entPassword.delete(0, END)
 
@@ -72,12 +76,15 @@ class Interface():
             btnOpenLogIn.grid_forget()
             lblCourse.grid_forget()
             self.cmbCourse.grid_forget()
+            lblID.grid_forget()
+            self.entID.grid_forget()
             btnLogIn.grid(row=2, column=0, columnspan=2, pady=10)
             lblOr.grid(row=3, column=0, columnspan=2, pady=5)
             btnOpenReg.grid(row=4, column=0, columnspan=2, pady=10)
             self.entUsername.delete(0, END)
             self.entPassword.delete(0, END)
             self.entRepeat.delete(0, END)
+            self.entID.delete(0, END)
             self.entPassword.option_clear()
 
         def tryLogIn():
@@ -125,38 +132,44 @@ class Interface():
         password = self.entPassword.get()
         passwordRep = self.entRepeat.get()
         course = self.cmbCourse.get()
+        id = self.entID.get()
 
         # Checks regarding registration fields are made here
-        if len(username) == 0 or len(password) == 0 or len(passwordRep) == 0 or len(course) == 0:
-            self.errMessage.grid(row=7, columnspan=2)
+        if len(username) == 0 or len(password) == 0 or len(passwordRep) == 0 or len(course) == 0 or len(id) == 0:
+            self.errMessage.grid(row=8, columnspan=2)
             self.errMessage.config(text="You must complete all registration fields!")
             return False
 
         if self.database.getUsername(username):
-            self.errMessage.grid(row=7, columnspan=2)
+            self.errMessage.grid(row=8, columnspan=2)
             self.errMessage.config(text="This username already exists!")
             return False
 
         if len(password) < 8:
-            self.errMessage.grid(row=7, columnspan=2)
+            self.errMessage.grid(row=8, columnspan=2)
             self.errMessage.config(text="Password must be 8 character or more!")
             return False
 
         if password != passwordRep:
-            self.errMessage.grid(row=7, columnspan=2)
+            self.errMessage.grid(row=8, columnspan=2)
             self.errMessage.config(text="Passwords do not match!")
+            return False
+
+        if len(id) > 8 or not re.findall(r'[Cc][0-9]{7}', id):
+            self.errMessage.grid(row=8, columnspan=2)
+            self.errMessage.config(text="Invalid Student ID.")
             return False
 
         # User is registered into the database here
         self.errMessage.grid_forget()
-        self.database.addEntry(username, password, course)
+        self.database.addEntry(username, password, course, id)
         messagebox.showinfo("Registered", "You have successfully registered! You can now log-in.")
         return True
 
     def createMenu(self, username):
         for row in self.database.getUserData(username):
-            print(row)
-
             lblCourse = Label(self.container, text=row[1], font=('MS', 10))
+            lblID = Label(self.container, text=row[2], font=('MS', 10))
 
             lblCourse.grid(row=0, column=0, columnspan=2)
+            lblID.grid(row=1, column=0, columnspan=2)
